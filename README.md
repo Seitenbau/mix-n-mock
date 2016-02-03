@@ -30,7 +30,7 @@ mix-n-mock offers several advantages compared to a ProxyPass rule:
 - Static file delivery can also be [delayed](doc/usage.md#delay)
 - Each HTTP method (GET, POST, PUT, DELETE) can be configured independently
 - HTTP status codes can easily be generated per service, i.e. it is easy to simulate errors
- 
+
 ## Installation
 
 - [clone this repository][clone]
