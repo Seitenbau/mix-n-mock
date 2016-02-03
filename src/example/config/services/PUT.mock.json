@@ -1,0 +1,11 @@
+{
+    "active": true,
+    "services": [
+        {
+            "active": false,
+            "path": "exampleEndpoint",
+            "file": "put-result.example.json",
+            "delayBy": 1000
+        }
+    ]
+}

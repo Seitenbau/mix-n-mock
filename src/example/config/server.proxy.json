@@ -1,0 +1,7 @@
+{
+    "backend": "http://example.com",
+    "delayedServices": {
+        "/EXAMPLE": 42
+    },
+    "rejectUnauthorized": false
+}
