@@ -33,7 +33,7 @@ module.exports = (projectName) => {
 
     // Setup
     var sourceFolder = __dirname;
-    var projectFolderRelative = projectName || 'project'; // TODO: doc
+    var projectFolderRelative = projectName || 'project';
     var projectFolderAbs = path.join(sourceFolder, projectFolderRelative);
     var globalConfig = konphyg(sourceFolder);
     var projectConfig, server;
@@ -354,8 +354,8 @@ module.exports = (projectName) => {
         server.use(express.compress());
 
         redirect(server);
-        server.redirect('/', serverRoot); // TODO: make configurable?
-        server.redirect(serverRoot, `${serverRoot}/`); // TODO: make configurable?
+        server.redirect('/', serverRoot); // TODO: make configurable? GH-8
+        server.redirect(serverRoot, `${serverRoot}/`); // TODO: make configurable? GH-8
 
         ['get', 'put', 'post', 'delete'].forEach(method => {
             let mockCfg = projectConfig(`services/${method.toUpperCase()}.mock`);

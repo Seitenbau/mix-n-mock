@@ -22,7 +22,7 @@ var automaticRestart = require('./automatic-restart');
 var params = process.argv.slice(2); // node scriptName [...]
 
 // main
-var restartIndex = params.indexOf('--restart'); // TODO: doc
+var restartIndex = params.indexOf('--restart');
 if (restartIndex !== -1) {
     params.splice(restartIndex, 1);
     params.forEach(automaticRestart);
