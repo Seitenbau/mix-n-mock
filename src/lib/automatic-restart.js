@@ -33,7 +33,7 @@ module.exports = (projectName) => {
     child.on('exit', console.info.bind(console, `mix-n-mock in ${projectFolderRelative} has terminated`));
 
     child.on('watch:restart', info => {
-        console.log(`\nRestarting mix-n-mock in ${projectFolderRelative} because the following file has changed: ${info.stat}\n`); // should be info.file, but forever-monitor 1.7.0 is buggy (cf. https://github.com/foreverjs/forever-monitor/pull/116)
+        console.log(`\nRestarting mix-n-mock in ${projectFolderRelative} because the following file has changed: ${info.stat}\n`); // should be info.file, but forever-monitor 1.7.0 is buggy (cf. foreverjs/forever-monitor#116)
     });
 
     process.on('SIGINT', () => {
