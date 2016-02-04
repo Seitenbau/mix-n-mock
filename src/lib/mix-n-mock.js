@@ -32,7 +32,7 @@ var unIndent = require('./helpers/unIndent.js');
 module.exports = (projectName) => {
 
     // Setup
-    var sourceFolder = __dirname;
+    var sourceFolder = path.join(__dirname, '..');
     var projectFolderRelative = projectName || 'project';
     var projectFolderAbs = path.join(sourceFolder, projectFolderRelative);
     var globalConfig = konphyg(sourceFolder);

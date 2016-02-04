@@ -16,8 +16,8 @@ limitations under the License.
 
 'use strict';
 
-var mixNmock = require('./mix-n-mock');
-var automaticRestart = require('./automatic-restart');
+var mixNmock = require('./lib/mix-n-mock');
+var automaticRestart = require('./lib/automatic-restart');
 
 var params = process.argv.slice(2); // node scriptName [...]
 
