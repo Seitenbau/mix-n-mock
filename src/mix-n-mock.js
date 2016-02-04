@@ -14,12 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+'use strict';
+
 var express = require('express');
 var http = require('http');
 var https = require('https');
 var request = require('request');
 var konphyg = require('konphyg');
-var _ = require('lodash');
 var redirect = require('express-redirect');
 var fs = require('fs');
 var path = require('path');
@@ -108,7 +109,7 @@ module.exports = (projectName) => {
      * @param {{}} response The response object
      */
     var sendDelayedFile = (filePath, delayBy, request, response) => {
-        _.delay(_.bind(response.sendfile, response, filePath), delayBy);
+        setTimeout(response.sendfile.bind(response, filePath), delayBy);
     };
 
     /**
@@ -122,13 +123,13 @@ module.exports = (projectName) => {
     var sendDelayedError = (errorConfig, delayBy, filePath, request, response) => {
         var responseFunc;
         if (errorConfig.error) {
-            responseFunc = _.bind(response.send, response, errorConfig.status, {faultCode: errorConfig.error});
+            responseFunc = response.send.bind(response, errorConfig.status, {faultCode: errorConfig.error});
         } else if (filePath) {
             responseFunc = () => {
                 response.status(errorConfig.status).sendfile(filePath);
             };
         }
-        _.delay(responseFunc, delayBy);
+        setTimeout(responseFunc, delayBy);
     };
 
     /**
@@ -176,15 +177,15 @@ module.exports = (projectName) => {
         var mockFunc;
         if (mock.file && !mock.error) {
             if (mock.delayBy) {
-                mockFunc = _.partial(sendDelayedFile, filePath, mock.delayBy);
+                mockFunc = sendDelayedFile.bind(this, filePath, mock.delayBy);
             } else {
-                mockFunc = _.partial(sendFile, filePath);
+                mockFunc = sendFile.bind(this, filePath);
             }
         } else if (mock.error) {
             if (mock.delayBy) {
-                mockFunc = _.partial(sendDelayedError, mock.error, mock.delayBy, filePath);
+                mockFunc = sendDelayedError.bind(this, mock.error, mock.delayBy, filePath);
             } else {
-                mockFunc = _.partial(sendError, mock.error, filePath);
+                mockFunc = sendError.bind(this, mock.error, filePath);
             }
         }
         return mockFunc;
@@ -192,7 +193,7 @@ module.exports = (projectName) => {
 
     /**
      * Setups a mock service for the given path and method
-     * @param {string} methodName The name of the REST method PUT, GET, POST, …
+     * @param {string} methodName The name of the HTTP method PUT, GET, POST, …
      * @param {{
      *      file: string,
      *      delayBy: number,
@@ -210,11 +211,11 @@ module.exports = (projectName) => {
         var directory = path.join(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
         var filePath = mock.file ? getFilePath(directory, mock.file) : '';
         var mockFunc = getMockingFunction(mock, filePath);
-        if (mock.path.indexOf('/') === 0) {
+        if (mock.path.indexOf('/') === 0) { // FIXME: why do we need this?
             throw `${mock.path} should not start with a slash. The mocked service will not work!`;
         }
         if (mockFunc) {
-            server[methodName](RESTRoot + '/' + mock.path, mockFunc);
+            server[methodName.toLowerCase()](RESTRoot + '/' + mock.path, mockFunc);
         }
     };
 
@@ -228,7 +229,7 @@ module.exports = (projectName) => {
      */
     var setupRESTMocks = (mocks, mockFunc) => {
         if (mocks.active) {
-            _.each(_.where(mocks.services, {active: true}), mockFunc);
+            mocks.services.filter(s => s.active).forEach(mockFunc);
         }
     };
 
@@ -240,7 +241,7 @@ module.exports = (projectName) => {
      * @param {Object} res The response object
      */
     var pipeRequest = (requestConfig, req, res) => {
-        var remote = request(_.extend({}, requestConfig, {
+        var remote = request(Object.assign({}, requestConfig, {
             url: serverProxyConfig.backend + req.url.replace(serverRoot, '')
         }));
         req.pipe(remote);
@@ -263,7 +264,7 @@ module.exports = (projectName) => {
                 var delay = serverProxyConfig.delayedServices[key];
                 if (delay) {
                     console.log(`delaying ${key} for ${delay} ms`);
-                    _.delay(_.partial(pipeRequest, requestConfig, req, res), delay);
+                    setTimeout(pipeRequest.bind(this, requestConfig, req, res), delay);
                 } else {
                     pipeRequest(requestConfig, req, res);
                 }
@@ -321,11 +322,9 @@ module.exports = (projectName) => {
             rejectUnauthorized: serverProxyConfig.rejectUnauthorized !== false
         };
         if (localProxyConfig.active) {
-            _.extend(requestConfig, {
-                proxy: `${localProxyConfig.url}:${localProxyConfig.port}`
-            });
+            requestConfig.proxy = `${localProxyConfig.url}:${localProxyConfig.port}`;
         }
-        server.use(_.partial(proxyREST, requestConfig));
+        server.use(proxyREST.bind(this, requestConfig));
         server.use(proxyFilesystem);
     };
 
@@ -359,7 +358,8 @@ module.exports = (projectName) => {
         server.redirect(serverRoot, `${serverRoot}/`); // TODO: make configurable?
 
         ['get', 'put', 'post', 'delete'].forEach(method => {
-            setupRESTMocks(projectConfig(`services/${method.toUpperCase()}.mock`), _.partial(setupRESTMock, method));
+            let mockCfg = projectConfig(`services/${method.toUpperCase()}.mock`);
+            setupRESTMocks(mockCfg, setupRESTMock.bind(this, method));
         });
 
         setupProxying();
@@ -389,7 +389,7 @@ module.exports = (projectName) => {
     if (sslPort > 0) {
         var httpsServer = https.createServer({key: privateKey, cert: certificate}, server);
         httpsServer.on('error', () => {
-            console.warn(`Could not launch HTTPS server on port ${sslPort}! Try again as admin.`);
+            console.warn(`Could not launch HTTPS server on port ${sslPort}! Try again as admin or use a different port.`);
             sslPort = -1;
         });
         httpsServer.listen(sslPort);
