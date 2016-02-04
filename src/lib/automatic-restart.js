@@ -21,9 +21,10 @@ var path = require('path');
 
 module.exports = (projectName) => {
 
+    var sourceFolder = path.join(__dirname, '..');
     var projectFolderRelative = projectName || 'project';
-    var projectFolderAbs = path.join(__dirname, projectFolderRelative);
-    var child = new forever.Monitor(path.join(__dirname, 'index.js'), {
+    var projectFolderAbs = path.join(sourceFolder, projectFolderRelative);
+    var child = new forever.Monitor(path.join(sourceFolder, 'index.js'), {
         args: [projectFolderRelative],
         watch: true,
         watchDirectory: path.join(projectFolderAbs, 'config'),
