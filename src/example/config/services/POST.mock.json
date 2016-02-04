@@ -2,7 +2,7 @@
     "active": true,
     "services": [
         {
-            "active": false,
+            "active": true,
             "path": "exampleEndpoint",
             "file": "post-result.example.json",
             "delayBy": 100

@@ -2,7 +2,7 @@
     "active": true,
     "services": [
         {
-            "active": false,
+            "active": true,
             "path": "exampleEndpoint",
             "file": "put-result.example.json",
             "delayBy": 1000
