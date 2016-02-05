@@ -21,10 +21,20 @@ var automaticRestart = require('./lib/automatic-restart');
 
 var params = process.argv.slice(2); // node scriptName [...]
 
+// process command line parameters
+var allowedFlags = {
+    '-r': '--restart'
+};
+var flags = params.reduceRight((result, param, i) => {
+    if (param[0] === '-') {
+        params.splice(i, 1);
+        result[allowedFlags[param] || param] = true;
+    }
+    return result;
+}, {});
+
 // main
-var restartIndex = params.indexOf('--restart');
-if (restartIndex !== -1) {
-    params.splice(restartIndex, 1);
+if (flags.hasOwnProperty('--restart')) {
     params.forEach(automaticRestart);
 } else {
     if (params.length) {
