@@ -1,5 +1,4 @@
-# mix-n-mock
-![mix-n-mock logo](https://cdn.rawgit.com/Seitenbau/mix-n-mock/master/doc/mix-n-mock-logo.svg)
+# mix-n-mock    <img alt="mix-n-mock logo" src="https://cdn.rawgit.com/Seitenbau/mix-n-mock/master/doc/mix-n-mock-logo.svg" align="right" height="50">
 
 The configurable mixing proxy for your web development needs
 

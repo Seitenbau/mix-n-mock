@@ -18,16 +18,18 @@ limitations under the License.
 
 var forever = require('forever-monitor');
 var path = require('path');
+var getProjectPaths = require('./helpers/getProjectPaths');
 
 module.exports = (projectName) => {
 
-    var sourceFolder = path.join(__dirname, '..');
-    var projectFolderRelative = projectName || 'project';
-    var projectFolderAbs = path.join(sourceFolder, projectFolderRelative);
-    var child = new forever.Monitor(path.join(sourceFolder, 'index.js'), {
+    var paths = getProjectPaths(projectName);
+    var sourceFolder = paths.sourceFolder;
+    var projectFolderRelative = paths.projectFolderRelative;
+    var projectFolderAbs = paths.projectFolderAbs;
+    var child = new forever.Monitor(path.resolve(sourceFolder, 'index.js'), {
         args: [projectFolderRelative],
         watch: true,
-        watchDirectory: path.join(projectFolderAbs, 'config'),
+        watchDirectory: path.resolve(projectFolderAbs, 'config'),
         killTree: true
     });
 

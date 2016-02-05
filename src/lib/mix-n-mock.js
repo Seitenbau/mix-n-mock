@@ -27,18 +27,20 @@ var path = require('path');
 var fileExists = require('file-exists');
 
 var unIndent = require('./helpers/unIndent.js');
+var getProjectPaths = require('./helpers/getProjectPaths');
 
 
 module.exports = (projectName) => {
 
     // Setup
-    var sourceFolder = path.join(__dirname, '..');
-    var projectFolderRelative = projectName || 'project';
-    var projectFolderAbs = path.join(sourceFolder, projectFolderRelative);
+    var paths = getProjectPaths(projectName);
+    var sourceFolder = paths.sourceFolder;
+    var projectFolderRelative = paths.projectFolderRelative;
+    var projectFolderAbs = paths.projectFolderAbs;
     var globalConfig = konphyg(sourceFolder);
     var projectConfig, server;
     try {
-        projectConfig = konphyg(path.join(projectFolderAbs, 'config'));
+        projectConfig = konphyg(path.resolve(projectFolderAbs, 'config'));
     } catch (e) {
         console.error(`FATAL: Could not open project "${projectFolderRelative}".`);
         if (!projectName) {
@@ -51,8 +53,8 @@ module.exports = (projectName) => {
     var configuredPort = projectConfig('server.port');
 
     // HTTPS certificates
-    var privateKey = fs.readFileSync(path.join(sourceFolder, 'sslcert/localhost.pem'), 'utf8');
-    var certificate = fs.readFileSync(path.join(sourceFolder, 'sslcert/localhost.crt'), 'utf8');
+    var privateKey = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.pem'), 'utf8');
+    var certificate = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.crt'), 'utf8');
 
     // Mocking services
     var rootConfig = projectConfig('server.root');
@@ -65,10 +67,10 @@ module.exports = (projectName) => {
 
     /**
      * @typedef {{
-        *   active: {boolean} Whether the above mentioned configuration should be used or not. If you are not behind a proxy set it to false,
-        *   url: {string} The URL of the proxy server,
-        *   port: {(string|number)} The port of the proxy server
-        * }}
+     *   active: {boolean} Whether the above mentioned configuration should be used or not. If you are not behind a proxy set it to false,
+     *   url: {string} The URL of the proxy server,
+     *   port: {(string|number)} The port of the proxy server
+     * }}
      */
     var localProxyConfig = globalConfig('local.proxy');
 
@@ -82,7 +84,7 @@ module.exports = (projectName) => {
     var serverProxyConfig = projectConfig('server.proxy');
 
     var unVersionedFileNameInfix = 'development';
-    var staticFilesDirAbs = path.join(projectFolderAbs, staticFilesDirRel);
+    var staticFilesDirAbs = path.resolve(projectFolderAbs, staticFilesDirRel);
 
     /**
      * Given a file path, it tries to find the local and un-versioned version of it (marked by *.development.*) and returns
@@ -96,8 +98,8 @@ module.exports = (projectName) => {
         var name = splitFileName[0];
         var ending = splitFileName[1];
         var devFileName = name + `.${unVersionedFileNameInfix}.${ending}`;
-        var devFilePath = path.join(filePath, devFileName);
-        var regularFilePath = path.join(filePath, fileName);
+        var devFilePath = path.resolve(filePath, devFileName);
+        var regularFilePath = path.resolve(filePath, fileName);
         return fileExists(devFilePath) ? devFilePath : regularFilePath;
     };
 
@@ -208,7 +210,7 @@ module.exports = (projectName) => {
      * @param {string} mock.file The JSON file which should be returned by the service mock
      */
     var setupRESTMock = (methodName, mock) => {
-        var directory = path.join(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
+        var directory = path.resolve(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
         var filePath = mock.file ? getFilePath(directory, mock.file) : '';
         var mockFunc = getMockingFunction(mock, filePath);
         if (mock.path.indexOf('/') === 0) {
@@ -293,7 +295,7 @@ module.exports = (projectName) => {
             file = null;
         } else if (rootConfig.defaultFile && req.path.replace(/\/?$/, '') === serverRoot) {
             // The requested file is our server root, therefore we need to send index.html
-            file = path.join(path.normalize(staticFilesDirAbs), rootConfig.defaultFile);
+            file = path.resolve(staticFilesDirAbs, rootConfig.defaultFile);
         } else if (fs.existsSync(requestedFile)) {
             // The file is neither a file found in our dev path nor a request for the index, then it must be a file which
             // can only be found in the src directory (during development);
@@ -365,7 +367,7 @@ module.exports = (projectName) => {
         setupProxying();
 
         server.use(serverRoot, express.static(staticFilesDirAbs, {redirect: false}));
-        server.use('/', express.static(path.join(sourceFolder, '..'), {redirect: false})); // TODO: This grants access to the mix-n-mock project folder. Do we want this? GH-16
+        server.use('/', express.static(path.resolve(sourceFolder, '..'), {redirect: false})); // TODO: This grants access to the mix-n-mock project folder. Do we want this? GH-16
 
         server.use(express.errorHandler({
             dumpExceptions: true,
