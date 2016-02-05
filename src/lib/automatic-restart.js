@@ -19,6 +19,7 @@ limitations under the License.
 var forever = require('forever-monitor');
 var path = require('path');
 var getProjectPaths = require('./helpers/getProjectPaths');
+var mixNmock = require('./mix-n-mock');
 
 module.exports = (projectName) => {
 
@@ -26,23 +27,31 @@ module.exports = (projectName) => {
     var sourceFolder = paths.sourceFolder;
     var projectFolderRelative = paths.projectFolderRelative;
     var projectFolderAbs = paths.projectFolderAbs;
-    var child = new forever.Monitor(path.resolve(sourceFolder, 'index.js'), {
+
+    var bigBrother = new forever.Monitor(path.resolve(sourceFolder, 'index.js'), {
         args: [projectFolderRelative],
         watch: true,
         watchDirectory: path.resolve(projectFolderAbs, 'config'),
         killTree: true
     });
 
-    child.on('exit', console.info.bind(console, `mix-n-mock in ${projectFolderRelative} has terminated`));
+    bigBrother.on('exit:code', (code, signal) => {
+        if (code === mixNmock.errorCodes.PROJECT_NOT_FOUND) {
+            bigBrother.stop();
+            process.exit(code);
+        }
+        console.info(`mix-n-mock in ${projectFolderRelative} has terminated`);
+    });
 
-    child.on('watch:restart', info => {
+    bigBrother.on('watch:restart', info => {
         console.log(`\nRestarting mix-n-mock in ${projectFolderRelative} because the following file has changed: ${info.stat}\n`); // should be info.file, but forever-monitor 1.7.0 is buggy (cf. foreverjs/forever-monitor#116)
     });
 
     process.on('SIGINT', () => {
         console.log(`Killing mix-n-mock in ${projectFolderRelative}`);
-        child.kill();
+        bigBrother.kill();
         process.nextTick(process.exit.bind(process));
     });
-    child.start();
+
+    bigBrother.start();
 };

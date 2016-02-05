@@ -29,8 +29,11 @@ var fileExists = require('file-exists');
 var unIndent = require('./helpers/unIndent.js');
 var getProjectPaths = require('./helpers/getProjectPaths');
 
+var errorCodes = {
+    PROJECT_NOT_FOUND: 1
+};
 
-module.exports = (projectName) => {
+var run = (projectName) => {
 
     // Setup
     var paths = getProjectPaths(projectName);
@@ -46,7 +49,7 @@ module.exports = (projectName) => {
         if (!projectName) {
             console.error(`Remember to pass the project folder name as an argument.`);
         }
-        process.exit(1);
+        process.exit(errorCodes.PROJECT_NOT_FOUND);
     }
 
     // Server port configuration
@@ -428,4 +431,9 @@ module.exports = (projectName) => {
 
         Please go to ${urls.join(' or ')} to start using it.`);
     });
+};
+
+module.exports = {
+    run: run,
+    errorCodes: errorCodes
 };

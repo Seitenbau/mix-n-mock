@@ -1,8 +1,9 @@
 var path = require('path');
+
 /**
  * Determine the project paths
  * @param projectName
- * @returns {{sourceFolder: string, projectFolderRelative: string, projectFolderAbs: string}}
+ * @return {{sourceFolder: string, projectFolderRelative: string, projectFolderAbs: string}}
  */
 module.exports = (projectName) => {
     var sourceFolder = path.resolve(__dirname, '..', '..');
