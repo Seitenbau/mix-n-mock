@@ -40,7 +40,8 @@ To have mix-n-mock restart automatically when any of the config files changes, p
 
 Note that the extra `--` is mandatory for `npm start`.
 
-TODO: write the rest of this <!-- GH-2 -->
+<!-- GH-2 -->
+TODO: write the rest of this
 
 ## Configuration
 ### defaultFile
