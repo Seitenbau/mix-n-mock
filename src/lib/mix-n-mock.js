@@ -211,7 +211,7 @@ module.exports = (projectName) => {
         var directory = path.join(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
         var filePath = mock.file ? getFilePath(directory, mock.file) : '';
         var mockFunc = getMockingFunction(mock, filePath);
-        if (mock.path.indexOf('/') === 0) { // FIXME: why do we need this?
+        if (mock.path.indexOf('/') === 0) {
             throw `${mock.path} should not start with a slash. The mocked service will not work!`;
         }
         if (mockFunc) {
@@ -307,7 +307,7 @@ module.exports = (projectName) => {
         var relPath = path.relative(serverRoot, requestedUrl);
         var file = getFilePathForRequest(staticFilesDirRel, relPath, req);
         if (file) {
-            res.charset = 'utf-8'; // TODO: use https://www.npmjs.com/package/detect-encoding ?
+            res.charset = 'utf-8'; // TODO: use https://www.npmjs.com/package/detect-encoding ? GH-15
             res.sendfile(file);
             return;
         }
@@ -365,7 +365,7 @@ module.exports = (projectName) => {
         setupProxying();
 
         server.use(serverRoot, express.static(staticFilesDirAbs, {redirect: false}));
-        server.use('/', express.static(path.join(__dirname, '..'), {redirect: false})); // TODO: wrong path?
+        server.use('/', express.static(path.join(sourceFolder, '..'), {redirect: false})); // TODO: This grants access to the mix-n-mock project folder. Do we want this? GH-16
 
         server.use(express.errorHandler({
             dumpExceptions: true,
