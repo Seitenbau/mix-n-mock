@@ -388,15 +388,31 @@ let run = projectName => {
     let port = ports[0];
     let sslPort = ports[1];
 
+    let httpServer, httpsServer;
+    let errorHandler = function (err) {
+        let type;
+        if (this === httpServer) {
+            httpServer = null;
+            type = 'HTTP';
+        } else {
+            httpsServer = null;
+            type = 'HTTPS';
+        }
+        console.error(`Could not launch ${type} server on port ${err.port}!`);
+        if (err.code === 'EACCES') {
+            console.warn(`Insufficient privileges. Try again as admin or use a high port.`);
+        } else if (err.code === 'EADDRINUSE') {
+            console.warn('The port is already taken by another server running.');
+        }
+    };
+
     // Start Node.js Server
-    let httpServer = http.createServer(server);
+    httpServer = http.createServer(server);
+    httpServer.on('error', errorHandler.bind(httpServer));
     httpServer.listen(port);
     if (sslPort > 0) {
-        let httpsServer = https.createServer({key: privateKey, cert: certificate}, server);
-        httpsServer.on('error', () => {
-            console.warn(`Could not launch HTTPS server on port ${sslPort}! Try again as admin or use a different port.`);
-            sslPort = -1;
-        });
+        httpsServer = https.createServer({key: privateKey, cert: certificate}, server);
+        httpsServer.on('error', errorHandler.bind(httpsServer));
         httpsServer.listen(sslPort);
     }
 
@@ -419,17 +435,20 @@ let run = projectName => {
     let ip = getIp();
 
     process.nextTick(() => {
-        let urls = [`http://localhost:${port}${serverRoot}`];
-        if (sslPort > 0) {
+        let urls = httpServer ? [`http://localhost:${port}${serverRoot}`] : [];
+        if (httpsServer) {
+            // HTTPS certificate is valid for hostname 'localhost' only, hence invalid for IP
             urls.unshift(`https://localhost:${sslPort}${serverRoot}`);
         }
-        if (ip) {
+        if (httpServer) {
             urls.push(`http://${ip}:${port}${serverRoot}`);
         }
 
-        console.log(unIndent `Welcome to mix-n-mock!
+        if (httpServer || httpsServer) {
+            console.log(unIndent `Welcome to mix-n-mock!
 
-        Please go to ${urls.join(' or ')} to start using it.`);
+            Please go to ${urls.join(' or ')} to start using it.`);
+        }
     });
 };
 
