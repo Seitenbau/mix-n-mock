@@ -70,18 +70,18 @@ var run = (projectName) => {
 
     /**
      * @typedef {{
-     *   active: {boolean} Whether the above mentioned configuration should be used or not. If you are not behind a proxy set it to false,
-     *   url: {string} The URL of the proxy server,
-     *   port: {(string|number)} The port of the proxy server
+     *     active: {boolean} Whether the above mentioned configuration should be used or not. If you are not behind a proxy set it to false,
+     *     url: {string} The URL of the proxy server,
+     *     port: {(string|number)} The port of the proxy server
      * }}
      */
     var localProxyConfig = globalConfig('local.proxy');
 
     /**
      * @typedef {{
-     *      backend: {string} The base URL of the real backend,
-     *      delayedServices: {Object} Services specified here are called after the given amount of time has passed,
-     *      rejectUnauthorized: {boolean} Whether invalid certificates should be rejected or not
+     *     backend: {string} The base URL of the real backend,
+     *     delayedServices: {Object} Services specified here are called after the given amount of time has passed,
+     *     rejectUnauthorized: {boolean} Whether invalid certificates should be rejected or not
      * }}
      */
     var serverProxyConfig = projectConfig('server.proxy');
@@ -166,14 +166,14 @@ var run = (projectName) => {
     /**
      * Returns a function for mocking the request based on the given mock configuration
      * @param {{
-     *      file: string,
-     *      delayBy: number,
-     *      error: {
-     *          status: number,
-     *          error: string
-     *      },
-     *      path: string,
-     *      active: boolean
+     *     file: string,
+     *     delayBy: number,
+     *     error: {
+     *         status: number,
+     *         error: string
+     *     },
+     *     path: string,
+     *     active: boolean
      * }} mock The configuration object
      * @param {string} filePath The full path to the file which is send as a response
      * @return {Function|undefined}
@@ -200,14 +200,14 @@ var run = (projectName) => {
      * Setups a mock service for the given path and method
      * @param {string} methodName The name of the HTTP method PUT, GET, POST, …
      * @param {{
-     *      file: string,
-     *      delayBy: number,
-     *      error: {
-     *          status: number,
-     *          error: string
-     *      },
-     *      path: string,
-     *      active: boolean
+     *     file: string,
+     *     delayBy: number,
+     *     error: {
+     *         status: number,
+     *         error: string
+     *     },
+     *     path: string,
+     *     active: boolean
      * }} mock The configuration object
      * @param {string} mock.path The REST path which has to be mocked
      * @param {string} mock.file The JSON file which should be returned by the service mock
