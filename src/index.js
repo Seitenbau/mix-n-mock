@@ -32,6 +32,17 @@ let flags = params.reduceRight((result, param, i) => {
     }
     return result;
 }, {});
+let invalidFlags = Object.keys(flags).filter(flag => {
+    for (var key in allowedFlags) {
+        if (allowedFlags.hasOwnProperty(key) && (flag === key || flag === allowedFlags[key])) {
+            return false;
+        }
+    }
+    return true;
+});
+if (invalidFlags.length) {
+    console.warn(`WARNING: Ignoring invalid command line parameter${invalidFlags.length > 1 ? 's' : ''} ${invalidFlags.join(', ')}`);
+}
 
 // main
 if (flags.hasOwnProperty('--restart')) {
