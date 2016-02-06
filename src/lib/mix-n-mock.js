@@ -16,32 +16,33 @@ limitations under the License.
 
 'use strict';
 
-var express = require('express');
-var http = require('http');
-var https = require('https');
-var request = require('request');
-var konphyg = require('konphyg');
-var redirect = require('express-redirect');
-var fs = require('fs');
-var path = require('path');
-var fileExists = require('file-exists');
+const express = require('express');
+const http = require('http');
+const https = require('https');
+const request = require('request');
+const konphyg = require('konphyg');
+const redirect = require('express-redirect');
+const fs = require('fs');
+const path = require('path');
+const fileExists = require('file-exists');
 
-var unIndent = require('./helpers/unIndent.js');
-var getProjectPaths = require('./helpers/getProjectPaths');
+const unIndent = require('./helpers/unIndent.js');
+const getProjectPaths = require('./helpers/getProjectPaths');
 
-var errorCodes = {
+let errorCodes = {
     PROJECT_NOT_FOUND: 1
 };
+const unVersionedFileNameInfix = 'development';
 
-var run = (projectName) => {
+let run = projectName => {
 
     // Setup
-    var paths = getProjectPaths(projectName);
-    var sourceFolder = paths.sourceFolder;
-    var projectFolderRelative = paths.projectFolderRelative;
-    var projectFolderAbs = paths.projectFolderAbs;
-    var globalConfig = konphyg(sourceFolder);
-    var projectConfig, server;
+    const paths = getProjectPaths(projectName);
+    const sourceFolder = paths.sourceFolder;
+    const projectFolderRelative = paths.projectFolderRelative;
+    const projectFolderAbs = paths.projectFolderAbs;
+    const globalConfig = konphyg(sourceFolder);
+    let projectConfig, server;
     try {
         projectConfig = konphyg(path.resolve(projectFolderAbs, 'config'));
     } catch (e) {
@@ -53,20 +54,20 @@ var run = (projectName) => {
     }
 
     // Server port configuration
-    var configuredPort = projectConfig('server.port');
+    const configuredPort = projectConfig('server.port');
 
     // HTTPS certificates
-    var privateKey = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.pem'), 'utf8');
-    var certificate = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.crt'), 'utf8');
+    const privateKey = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.pem'), 'utf8');
+    const certificate = fs.readFileSync(path.resolve(sourceFolder, 'sslcert/localhost.crt'), 'utf8');
 
     // Mocking services
-    var rootConfig = projectConfig('server.root');
-    var serverRoot = rootConfig.root.replace(/\/+$/, '');
-    var RESTRoot = (serverRoot + '/' + rootConfig.serviceBasePath).replace(/\/+$/, '').replace(/\/+/g, '/');
+    const rootConfig = projectConfig('server.root');
+    const serverRoot = rootConfig.root.replace(/\/+$/, '');
+    const RESTRoot = (serverRoot + '/' + rootConfig.serviceBasePath).replace(/\/+$/, '').replace(/\/+/g, '/');
 
     // Path config
-    var staticFilesDirRel = projectConfig('filesystem.path').public;
-    var mockFilesDirRel = projectConfig('filesystem.path').mock;
+    const staticFilesDirRel = projectConfig('filesystem.path').public;
+    const mockFilesDirRel = projectConfig('filesystem.path').mock;
 
     /**
      * @typedef {{
@@ -75,7 +76,7 @@ var run = (projectName) => {
      *     port: {(string|number)} The port of the proxy server
      * }}
      */
-    var localProxyConfig = globalConfig('local.proxy');
+    const localProxyConfig = globalConfig('local.proxy');
 
     /**
      * @typedef {{
@@ -84,10 +85,9 @@ var run = (projectName) => {
      *     rejectUnauthorized: {boolean} Whether invalid certificates should be rejected or not
      * }}
      */
-    var serverProxyConfig = projectConfig('server.proxy');
+    const serverProxyConfig = projectConfig('server.proxy');
 
-    var unVersionedFileNameInfix = 'development';
-    var staticFilesDirAbs = path.resolve(projectFolderAbs, staticFilesDirRel);
+    const staticFilesDirAbs = path.resolve(projectFolderAbs, staticFilesDirRel);
 
     /**
      * Given a file path, it tries to find the local and un-versioned version of it (marked by *.development.*) and returns
@@ -96,13 +96,13 @@ var run = (projectName) => {
      * @param {string} fileName
      * @return {string}
      */
-    var getFilePath = (filePath, fileName) => {
-        var splitFileName = fileName.split('.');
-        var name = splitFileName[0];
-        var ending = splitFileName[1];
-        var devFileName = name + `.${unVersionedFileNameInfix}.${ending}`;
-        var devFilePath = path.resolve(filePath, devFileName);
-        var regularFilePath = path.resolve(filePath, fileName);
+    let getFilePath = (filePath, fileName) => {
+        let splitFileName = fileName.split('.');
+        let name = splitFileName[0];
+        let ending = splitFileName[1];
+        let devFileName = name + `.${unVersionedFileNameInfix}.${ending}`;
+        let devFilePath = path.resolve(filePath, devFileName);
+        let regularFilePath = path.resolve(filePath, fileName);
         return fileExists(devFilePath) ? devFilePath : regularFilePath;
     };
 
@@ -113,7 +113,7 @@ var run = (projectName) => {
      * @param {{}} request The request object
      * @param {{}} response The response object
      */
-    var sendDelayedFile = (filePath, delayBy, request, response) => {
+    let sendDelayedFile = (filePath, delayBy, request, response) => {
         setTimeout(response.sendfile.bind(response, filePath), delayBy);
     };
 
@@ -125,8 +125,8 @@ var run = (projectName) => {
      * @param {{}} request The request object
      * @param {{}} response The response object
      */
-    var sendDelayedError = (errorConfig, delayBy, filePath, request, response) => {
-        var responseFunc;
+    let sendDelayedError = (errorConfig, delayBy, filePath, request, response) => {
+        let responseFunc;
         if (errorConfig.error) {
             responseFunc = response.send.bind(response, errorConfig.status, {faultCode: errorConfig.error});
         } else if (filePath) {
@@ -143,7 +143,7 @@ var run = (projectName) => {
      * @param {{}} request The request object
      * @param {{}} response The response object
      */
-    var sendFile = (filePath, request, response) => {
+    let sendFile = (filePath, request, response) => {
         response.sendfile(filePath);
     };
 
@@ -155,7 +155,7 @@ var run = (projectName) => {
      * @param {{}} request The request object
      * @param {{}} response The response object
      */
-    var sendError = (errorConfig, filePath, request, response) => {
+    let sendError = (errorConfig, filePath, request, response) => {
         if (errorConfig.error) {
             response.send(errorConfig.status, {faultCode: errorConfig.error});
         } else if (filePath) {
@@ -178,8 +178,8 @@ var run = (projectName) => {
      * @param {string} filePath The full path to the file which is send as a response
      * @return {Function|undefined}
      */
-    var getMockingFunction = (mock, filePath) => {
-        var mockFunc;
+    let getMockingFunction = (mock, filePath) => {
+        let mockFunc;
         if (mock.file && !mock.error) {
             if (mock.delayBy) {
                 mockFunc = sendDelayedFile.bind(this, filePath, mock.delayBy);
@@ -212,10 +212,10 @@ var run = (projectName) => {
      * @param {string} mock.path The REST path which has to be mocked
      * @param {string} mock.file The JSON file which should be returned by the service mock
      */
-    var setupRESTMock = (methodName, mock) => {
-        var directory = path.resolve(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
-        var filePath = mock.file ? getFilePath(directory, mock.file) : '';
-        var mockFunc = getMockingFunction(mock, filePath);
+    let setupRESTMock = (methodName, mock) => {
+        let directory = path.resolve(projectFolderAbs, mockFilesDirRel, methodName.toUpperCase());
+        let filePath = mock.file ? getFilePath(directory, mock.file) : '';
+        let mockFunc = getMockingFunction(mock, filePath);
         if (mock.path.indexOf('/') === 0) {
             throw `${mock.path} should not start with a slash. The mocked service will not work!`;
         }
@@ -232,7 +232,7 @@ var run = (projectName) => {
      * @param {Function} mockFunc The function which is called on each entry and which is doing the actual mocking work
      * should be mocked
      */
-    var setupRESTMocks = (mocks, mockFunc) => {
+    let setupRESTMocks = (mocks, mockFunc) => {
         if (mocks.active) {
             mocks.services.filter(s => s.active).forEach(mockFunc);
         }
@@ -245,8 +245,8 @@ var run = (projectName) => {
      * @param {Object} req The request object
      * @param {Object} res The response object
      */
-    var pipeRequest = (requestConfig, req, res) => {
-        var remote = request(Object.assign({}, requestConfig, {
+    let pipeRequest = (requestConfig, req, res) => {
+        let remote = request(Object.assign({}, requestConfig, {
             url: serverProxyConfig.backend + req.url.replace(serverRoot, '')
         }));
         req.pipe(remote);
@@ -262,11 +262,11 @@ var run = (projectName) => {
      * @param res
      * @param next
      */
-    var proxyREST = (requestConfig, req, res, next) => {
+    let proxyREST = (requestConfig, req, res, next) => {
         if (req.url.indexOf(RESTRoot) === 0) {
             if (serverProxyConfig.delayedServices) {
-                var key = decodeURIComponent(req.url.replace(RESTRoot, ''));
-                var delay = serverProxyConfig.delayedServices[key];
+                let key = decodeURIComponent(req.url.replace(RESTRoot, ''));
+                let delay = serverProxyConfig.delayedServices[key];
                 if (delay) {
                     console.log(`delaying ${key} for ${delay} ms`);
                     setTimeout(pipeRequest.bind(this, requestConfig, req, res), delay);
@@ -289,9 +289,9 @@ var run = (projectName) => {
      * @param {Object} req The request object itself
      * @return {?string}
      */
-    var getFilePathForRequest = (srcPath, relPath, req) => {
-        var file;
-        var requestedFile = path.resolve(srcPath, relPath);
+    let getFilePathForRequest = (srcPath, relPath, req) => {
+        let file;
+        let requestedFile = path.resolve(srcPath, relPath);
         if (path.normalize(requestedFile) === path.normalize(staticFilesDirAbs) && req.path.replace(/\/$/, '') !== serverRoot) {
             // The requested file can be found in our static file directory and can therefore can be handled by
             // express.static AND is not our root path, which can of course not be found in the static dir
@@ -307,10 +307,10 @@ var run = (projectName) => {
         return file;
     };
 
-    var proxyFilesystem = (req, res, next) => {
-        var requestedUrl = req.path;
-        var relPath = path.relative(serverRoot, requestedUrl);
-        var file = getFilePathForRequest(staticFilesDirRel, relPath, req);
+    let proxyFilesystem = (req, res, next) => {
+        let requestedUrl = req.path;
+        let relPath = path.relative(serverRoot, requestedUrl);
+        let file = getFilePathForRequest(staticFilesDirRel, relPath, req);
         if (file) {
             res.charset = 'utf-8'; // TODO: use https://www.npmjs.com/package/detect-encoding ? GH-15
             res.sendfile(file);
@@ -322,8 +322,8 @@ var run = (projectName) => {
     /**
      * Setups the proxying so the REST request can be answered by our real backend on a remote server
      */
-    var setupProxying = () => {
-        var requestConfig = {
+    let setupProxying = () => {
+        let requestConfig = {
             rejectUnauthorized: serverProxyConfig.rejectUnauthorized !== false
         };
         if (localProxyConfig.active) {
@@ -338,9 +338,9 @@ var run = (projectName) => {
      * @param {{port: number, sslPort: number}=} portConfig The port configuration file
      * @return {Array<number>} The server ports
      */
-    var setupServerPort = portConfig => {
-        var serverPort = 80;
-        var sslPort = 443;
+    let setupServerPort = portConfig => {
+        let serverPort = 80;
+        let sslPort = 443;
         if (portConfig) {
             if (typeof portConfig.port !== 'undefined') {
                 serverPort = portConfig.port;
@@ -384,15 +384,15 @@ var run = (projectName) => {
 
     // SERVER
     // ======
-    var ports = setupServerPort(configuredPort);
-    var port = ports[0];
-    var sslPort = ports[1];
+    let ports = setupServerPort(configuredPort);
+    let port = ports[0];
+    let sslPort = ports[1];
 
     // Start Node.js Server
-    var httpServer = http.createServer(server);
+    let httpServer = http.createServer(server);
     httpServer.listen(port);
     if (sslPort > 0) {
-        var httpsServer = https.createServer({key: privateKey, cert: certificate}, server);
+        let httpsServer = https.createServer({key: privateKey, cert: certificate}, server);
         httpsServer.on('error', () => {
             console.warn(`Could not launch HTTPS server on port ${sslPort}! Try again as admin or use a different port.`);
             sslPort = -1;
@@ -401,13 +401,13 @@ var run = (projectName) => {
     }
 
     // get local IP addresses
-    var getIp = () => {
-        var interfaces = require('os').networkInterfaces();
-        for (var device in interfaces) {
+    let getIp = () => {
+        let interfaces = require('os').networkInterfaces();
+        for (let device in interfaces) {
             if (interfaces.hasOwnProperty(device)) {
-                var details = interfaces[device];
-                for (var i = 0; i < details.length; i++) {
-                    var detail = details[i];
+                let details = interfaces[device];
+                for (let i = 0; i < details.length; i++) {
+                    let detail = details[i];
                     if (detail.family === 'IPv4' && !detail.internal) {
                         return detail.address;
                     }
@@ -416,10 +416,10 @@ var run = (projectName) => {
         }
         return null;
     };
-    var ip = getIp();
+    let ip = getIp();
 
     process.nextTick(() => {
-        var urls = [`http://localhost:${port}${serverRoot}`];
+        let urls = [`http://localhost:${port}${serverRoot}`];
         if (sslPort > 0) {
             urls.unshift(`https://localhost:${sslPort}${serverRoot}`);
         }

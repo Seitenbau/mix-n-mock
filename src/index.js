@@ -16,16 +16,16 @@ limitations under the License.
 
 'use strict';
 
-var runMixNmock = require('./lib/mix-n-mock').run;
-var automaticRestart = require('./lib/automatic-restart');
+const runMixNmock = require('./lib/mix-n-mock').run;
+const automaticRestart = require('./lib/automatic-restart');
 
-var params = process.argv.slice(2); // node scriptName [...]
+let params = process.argv.slice(2); // node scriptName [...]
 
 // process command line parameters
-var allowedFlags = {
+let allowedFlags = {
     '-r': '--restart'
 };
-var flags = params.reduceRight((result, param, i) => {
+let flags = params.reduceRight((result, param, i) => {
     if (param[0] === '-') {
         params.splice(i, 1);
         result[allowedFlags[param] || param] = true;

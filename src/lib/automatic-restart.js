@@ -16,19 +16,19 @@ limitations under the License.
 
 'use strict';
 
-var forever = require('forever-monitor');
-var path = require('path');
-var getProjectPaths = require('./helpers/getProjectPaths');
-var mixNmock = require('./mix-n-mock');
+const forever = require('forever-monitor');
+const path = require('path');
+const getProjectPaths = require('./helpers/getProjectPaths');
+const mixNmock = require('./mix-n-mock');
 
 module.exports = (projectName) => {
 
-    var paths = getProjectPaths(projectName);
-    var sourceFolder = paths.sourceFolder;
-    var projectFolderRelative = paths.projectFolderRelative;
-    var projectFolderAbs = paths.projectFolderAbs;
+    const paths = getProjectPaths(projectName);
+    const sourceFolder = paths.sourceFolder;
+    const projectFolderRelative = paths.projectFolderRelative;
+    const projectFolderAbs = paths.projectFolderAbs;
 
-    var bigBrother = new forever.Monitor(path.resolve(sourceFolder, 'index.js'), {
+    let bigBrother = new forever.Monitor(path.resolve(sourceFolder, 'index.js'), {
         args: [projectFolderRelative],
         watch: true,
         watchDirectory: path.resolve(projectFolderAbs, 'config'),
