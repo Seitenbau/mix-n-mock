@@ -417,22 +417,7 @@ let run = projectName => {
     }
 
     // get local IP addresses
-    let getIp = () => {
-        let interfaces = require('os').networkInterfaces();
-        for (let device in interfaces) {
-            if (interfaces.hasOwnProperty(device)) {
-                let details = interfaces[device];
-                for (let i = 0; i < details.length; i++) {
-                    let detail = details[i];
-                    if (detail.family === 'IPv4' && !detail.internal) {
-                        return detail.address;
-                    }
-                }
-            }
-        }
-        return null;
-    };
-    let ip = getIp();
+    let ip = require('./helpers/getIp')();
 
     process.nextTick(() => {
         let urls = httpServer ? [`http://localhost:${port}${serverRoot}`] : [];
