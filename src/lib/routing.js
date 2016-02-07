@@ -20,11 +20,12 @@ const express = require('express');
 const request = require('request');
 const fileExists = require('file-exists');
 const path = require('path');
+
 const getFilePath = require('./helpers/getFilePath');
 
 
 let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, projectConfig) => {
-    let setupMocks = () => {
+    let setupMocks = (mockFilesDirAbs, projectConfig) => {
         /**
          * Sends back the given error and delays the response
          * @param {{error: string, status: number}} errorConfig The error configuration object
@@ -109,7 +110,7 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
          * @param {string} mock.file The JSON file which should be returned by the service mock
          */
         let setupRESTMock = (methodName, mock) => {
-            let directory = path.resolve(paths.projectFolderAbs, paths.mockFilesDirRel, methodName.toUpperCase());
+            let directory = path.resolve(mockFilesDirAbs, methodName.toUpperCase());
             let filePath = mock.file ? getFilePath(directory, mock.file) : '';
             let mockFunc = getMockingFunction(mock, filePath);
             if (mock.path.indexOf('/') === 0) {
@@ -143,7 +144,7 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
     /**
      * Setups the proxying so the REST request can be answered by our real backend on a remote server
      */
-    let setupProxying = () => {
+    let setupProxying = (localProxyConfig, serverProxyConfig) => {
         /**
          * Takes the given request ands proxies it through to real backend
          * @param {{}} requestConfig The configuration for the request object
@@ -196,7 +197,7 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
         expressWare.use(proxyREST.bind(this, requestConfig));
     };
 
-    let setupStaticFiles = () => {
+    let setupStaticFiles = (paths) => {
         /**
          * Return the file system path for the requested file
          * @param {string} srcPath The path on the file system where the files are located
@@ -239,9 +240,9 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
         expressWare.use('/', express.static(path.resolve(paths.sourceFolder, '..'), {redirect: false})); // TODO: This grants access to the mix-n-mock project folder. Do we want this? GH-16
     };
 
-    setupMocks();
-    setupProxying();
-    setupStaticFiles();
+    setupMocks(paths.mockFilesDirAbs, projectConfig);
+    setupProxying(localProxyConfig, serverProxyConfig);
+    setupStaticFiles(paths);
 
     expressWare.use(roots.serverRoot, expressWare.router);
 };

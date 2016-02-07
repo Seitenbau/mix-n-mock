@@ -59,8 +59,9 @@ let run = projectName => {
 
     // Path config
     paths.staticFilesDirRel = projectConfig('filesystem.path').public;
-    paths.mockFilesDirRel = projectConfig('filesystem.path').mock;
     paths.staticFilesDirAbs = path.resolve(paths.projectFolderAbs, paths.staticFilesDirRel);
+    paths.mockFilesDirRel = projectConfig('filesystem.path').mock;
+    paths.mockFilesDirAbs = path.resolve(paths.projectFolderAbs, paths.mockFilesDirRel);
     paths.defaultFile = rootConfig.defaultFile;
 
     /**

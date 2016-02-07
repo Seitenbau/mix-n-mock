@@ -18,6 +18,7 @@ limitations under the License.
 
 const forever = require('forever-monitor');
 const path = require('path');
+
 const getProjectPaths = require('./helpers/getProjectPaths');
 const mixNmock = require('./mix-n-mock');
 
