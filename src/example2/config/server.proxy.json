@@ -1,0 +1,7 @@
+{
+    "backend": "https://api.github.com/users/SEITENBAU/repos",
+    "delayedServices": {
+        "/EXAMPLE": 42
+    },
+    "rejectUnauthorized": false
+}

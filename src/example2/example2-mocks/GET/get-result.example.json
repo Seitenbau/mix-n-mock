@@ -1,0 +1,5 @@
+{
+    "method": "GET",
+    "result": "ok",
+    "foo": 42
+}
