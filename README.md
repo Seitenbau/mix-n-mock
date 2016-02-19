@@ -36,7 +36,7 @@ mix-n-mock offers several advantages compared to a ProxyPass rule:
 - get [Node.js][] (Version 4 or higher)
 - run `npm install` in the project folder
 
-[Node.js]: http://nodejs.org/download/ (Node.js download page)
+[Node.js]: https://nodejs.org/en/download/ (Node.js download page)
 [clone]: https://help.github.com/articles/cloning-a-repository/ (Github help)
 
 ## Usage
