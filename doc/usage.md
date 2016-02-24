@@ -2,7 +2,6 @@
 
 ## Running mix-n-mock
 
-
 To launch mix-n-mock on a project named `foo`, just run
 
     $ node index.js foo
@@ -39,6 +38,17 @@ To have mix-n-mock restart automatically when any of the config files changes, p
     $ npm start -- --restart foo bar
 
 Note that the extra `--` is mandatory for `npm start`.
+
+## HTTPS certificates
+
+If you run an https server with an invalid certificate, your browser will complain about that. You have two options:
+
+* Either, ignore that warning. Anyway, depending on your website, you may run into trouble with the browser’s security mechanism that aims to protect you from malicious content.
+* Or, install the corresponding *root certificate*. This certificate is required to tell your browser that the website's certificate is ok. It must be installed manually.
+
+mix-n-mock comes with a certificate pair, one for the server, and one corresponding root certificate. Note that these certificates are only valid for the precise name `localhost`, so `127.0.0.1` or similar won't work.
+
+The certificates are located in `/src/sslcert`. See [sslcert/README.html](../src/sslcert/README.html) on how to install the root certificate. When you start mix-n-mock using the `sslPort` option, it will automatically use the server certificate.
 
 <!-- GH-2 -->
 TODO: write the rest of this
