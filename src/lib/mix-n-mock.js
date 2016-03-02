@@ -87,7 +87,7 @@ let run = projectName => {
 
 
 
-    launchServers(expressWare, roots, configuredPort, path.resolve(paths.sourceFolder, privateKeyPath), path.resolve(paths.sourceFolder, certificatePath));
+    launchServers(expressWare, roots, configuredPort, path.resolve(paths.sourceFolder, privateKeyPath), path.resolve(paths.sourceFolder, certificatePath), projectName);
 };
 
 module.exports = {

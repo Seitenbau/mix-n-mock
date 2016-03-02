@@ -22,7 +22,7 @@ const fs = require('fs');
 
 const unIndent = require('./helpers/unIndent.js');
 
-module.exports = (expressWare, roots, configuredPort, privateKeyPath, certificatePath) => {
+module.exports = (expressWare, roots, configuredPort, privateKeyPath, certificatePath, projectName) => {
     /**
      * Setups the port of the server
      * @param {{port: number, sslPort: number}=} portConfig The port configuration file
@@ -92,7 +92,7 @@ module.exports = (expressWare, roots, configuredPort, privateKeyPath, certificat
         }
 
         if (httpServer || httpsServer) {
-            console.log(unIndent `Welcome to mix-n-mock!
+            console.log(unIndent `Welcome to mix-n-mock in project “${projectName}”!
 
             Please go to ${urls.join(' or ')} to start using it.`);
         }

@@ -1,1 +1,4 @@
+# It is recommended to exclude .development.json files.
+# Please see the documentation for details
+
 *.development.json
