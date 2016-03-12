@@ -20,7 +20,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 
-const unIndent = require('./helpers/unIndent.js');
+const unIndent = require('./helpers/unIndent');
 
 module.exports = (expressWare, roots, configuredPort, privateKeyPath, certificatePath, projectName) => {
     /**
