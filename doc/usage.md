@@ -11,6 +11,7 @@
     - [filesystem.path.json](#filesystempathjson)
     - [server.proxy.json](#serverproxyjson)
     - [/local.proxy.json](#localproxyjson)
+    - [services/\*.json](#servicesjson)
 
 ## Running mix-n-mock
 
@@ -69,15 +70,15 @@ They must be placed in your projects `config/` folder.
 Here is the directory layout (click to open the corresponding example configuration):
 
 **[`config/`](../src/example/config)**  
-[`server.port.`](../src/example/config/server.port.json)     \# basic configuration  
-[`server.root.json`](../src/example/config/server.root.json)      \# routing  
-[`filesystem.path.json`](../src/example/config/filesystem.path.json)  \# static file locations  
-[`server.proxy.json`](../src/example/config/server.proxy.json)     \# real service proxying   
-**[`config/services/`](../src/example/config/services)**            \# mocked service configuration, one file per HTTP method  
-[`POST.mock.json`](../src/example/config/services/POST.mock.json)  
-[`GET.mock.json`](../src/example/config/services/GET.mock.json)  
-[`PUT.mock.json`](../src/example/config/services/PUT.mock.json)  
-[`DELETE.mock.json`](../src/example/config/services/DELETE.mock.json)  
+├ [`server.port.`](../src/example/config/server.port.json)     \# basic configuration  
+├ [`server.root.json`](../src/example/config/server.root.json)      \# routing  
+├ [`filesystem.path.json`](../src/example/config/filesystem.path.json)  \# static file locations  
+├ [`server.proxy.json`](../src/example/config/server.proxy.json)     \# real service proxying   
+└**[`config/services/`](../src/example/config/services)**            \# mocked service configuration, one file per HTTP method  
+  ├ [`POST.mock.json`](../src/example/config/services/POST.mock.json)  
+  ├ [`GET.mock.json`](../src/example/config/services/GET.mock.json)  
+  ├ [`PUT.mock.json`](../src/example/config/services/PUT.mock.json)  
+  └ [`DELETE.mock.json`](../src/example/config/services/DELETE.mock.json)  
 
 The reason why there are multiple config files, and not one big file, is outlined below.
 
@@ -207,7 +208,6 @@ An optional proxy server configuration for when you can’t access the backend d
 }
 ```
 
-<!-- GH-2 -->
-TODO: write the rest of this
-# mock configs
-### delay
+### services/\*.json
+
+See [service-config.md].
