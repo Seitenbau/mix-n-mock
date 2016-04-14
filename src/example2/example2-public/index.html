@@ -38,7 +38,7 @@
     }
 
     button {
-        width: 15em;
+        width: 30em;
         height: 2em;
         text-align: center;
     }
@@ -71,29 +71,48 @@
 <a href="img/example.by.Marcelo.Quinan.from.unsplash.com-CC-zero.jpg" target="_blank">static file</a>
 <ul>
     <li>
-        <button type="submit" data-method="GET" data-action="rest/exampleEndpoint">
+        <button type="submit" data-method="GET" data-action="exampleEndpoint">
             Submit GET-Request
         </button>
         <span>(no delay)</span>
     </li>
     <li>
-        <button type="submit" data-method="POST" data-action="rest/exampleEndpoint">
+        <button type="submit" data-method="POST" data-action="exampleEndpoint">
             Submit POST-Request
         </button>
         <span>(100ms delay)</span>
     </li>
     <li>
-        <button type="submit" data-method="PUT" data-action="rest/exampleEndpoint">
+        <button type="submit" data-method="PUT" data-action="exampleEndpoint">
             Submit PUT-Request
         </button>
         <span>(1s delay)</span>
     </li>
     <li>
-        <button type="submit" data-method="DELETE" data-action="rest/exampleEndpoint">
+        <button type="submit" data-method="DELETE" data-action="exampleEndpoint">
             Submit DELETE-Request
         </button>
         <span>(5s delay)</span>
     </li>
+    <li>
+        <button type="submit" data-method="GET" data-action="repos/SEITENBAU/mix-n-mock">
+            Get mix-n-mock repo info from Github
+        </button>
+        <span>(proxied)</span>
+    </li>
+    <li>
+        <button type="submit" data-method="GET" data-action="repos/github/github-services">
+            Get github/github-services repo info from Github
+        </button>
+        <span>(proxied)</span>
+    </li>
+    <li>
+        <button type="submit" data-method="GET" data-action="repos/mix-n-mock">
+            Get repos/mix-n-mock
+        </button>
+        <span>(simulated error)</span>
+    </li>
+
 </ul>
 <div class="hidden">
     <div class="result"></div>

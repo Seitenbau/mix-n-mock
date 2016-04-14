@@ -2,9 +2,13 @@
     "active": true,
     "services": [
         {
-            "active": true,
             "path": "exampleEndpoint",
             "file": "get-result.example.json"
+        }, {
+            "path": "mix-n-mock",
+            "error": {
+                "status": 500
+            }
         }
     ]
 }

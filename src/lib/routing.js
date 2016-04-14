@@ -20,6 +20,7 @@ const express = require('express');
 const request = require('request');
 const fileExists = require('file-exists');
 const path = require('path');
+const url = require('url');
 
 const getFilePath = require('./helpers/getFilePath');
 
@@ -154,7 +155,7 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
          */
         let pipeRequest = (requestConfig, req, res) => {
             let remote = request(Object.assign({}, requestConfig, {
-                url: serverProxyConfig.backend + req.url.replace(roots.serverRoot, '')
+                url: url.resolve(serverProxyConfig.backend, req.url.replace(roots.serverRoot, ''))
             }));
             req.pipe(remote);
             remote.pipe(res);
