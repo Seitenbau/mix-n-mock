@@ -1,0 +1,11 @@
+{
+    "active": true,
+    "services": [
+        {
+            "active": true,
+            "path": "exampleEndpoint",
+            "file": "delete-result.example.json",
+            "delayBy": 5000
+        }
+    ]
+}
