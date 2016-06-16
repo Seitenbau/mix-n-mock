@@ -1,3 +1,7 @@
 {
-    "backend": "http://localhost:4242"
+    "backend": "http://localhost:4242",
+    "delayedServices": {
+        "/delayed.txt": 750,
+        "shouldWorkWithoutSlash.txt": 300
+    }
 }
