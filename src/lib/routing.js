@@ -174,7 +174,7 @@ let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, pro
             if (req.url.indexOf(roots.RESTRoot) === 0) {
                 if (serverProxyConfig.delayedServices) {
                     let key = decodeURIComponent(req.url.replace(roots.RESTRoot, ''));
-                    let delay = serverProxyConfig.delayedServices[key];
+                    let delay = serverProxyConfig.delayedServices[key] || serverProxyConfig.delayedServices[key.replace(/\//, '')];
                     if (delay) {
                         console.log(`delaying ${key} for ${delay} ms`);
                         setTimeout(pipeRequest.bind(this, requestConfig, req, res), delay);

@@ -76,7 +76,6 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
             done();
         });
     });
-    /*
     it('Should fetch the test file (without leading slash) from the remote server and delay the response', function (done) {
         //TODO: The shouldWorkWithoutSlash.txt is specified inside the delayedServices without a leading slash and thus does not work (but it should!)
         const startTime = Date.now();
@@ -91,7 +90,6 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         });
         done();
     });
-    */
 });
 describe('Mocking GET request', function () {
     it('should return a JSON response when sending a GET request', function (done) {
