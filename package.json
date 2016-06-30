@@ -8,7 +8,8 @@
     "url": "https://github.com/Seitenbau/mix-n-mock.git"
   },
   "scripts": {
-    "test": "eslint src",
+    "test": "mocha src/test/test.js",
+    "lint": "eslint src",
     "start": "node src/index.js"
   },
   "keywords": [

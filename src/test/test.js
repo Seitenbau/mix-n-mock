@@ -29,32 +29,31 @@ const expect = require('expect');
 const mixNMockPort = JSON.parse(fs.readFileSync(path.resolve(configDir, 'server.port.json'), 'utf-8')).port;
 const mixNMockRoot = JSON.parse(fs.readFileSync(path.resolve(configDir, 'server.root.json'), 'utf-8')).root;
 let mixNMockServiceBasePath = JSON.parse(fs.readFileSync(path.resolve(configDir, 'server.root.json'), 'utf-8')).serviceBasePath;
+let localMockBasePath = JSON.parse(fs.readFileSync(path.resolve(configDir, 'filesystem.path.json'), 'utf-8')).mock;
 mixNMockServiceBasePath = mixNMockServiceBasePath.replace(/\//g, '');
 const remoteMockServer = JSON.parse(fs.readFileSync(path.resolve(configDir, 'server.proxy.json'), 'utf-8')).backend;
 const remoteMockPort = remoteMockServer.match(/\d+/)[0];
 
-let mockDir = path.resolve(__dirname, 'mock');
+let remoteServerMockDir = path.resolve(__dirname, 'remote-server-mock');
+let localMockDir = path.resolve(projectDir, localMockBasePath);
 
 // start remote mock and mix-n-mock instance
 let expressWare = express();
-expressWare.use('/', express.static(mockDir, {redirect: false}));
+expressWare.use('/', express.static(remoteServerMockDir, {redirect: false}));
 let remoteMock = http.createServer(expressWare);
 console.info(`Launching static mock server on port ${remoteMockPort}`);
 remoteMock.listen(remoteMockPort);
 mixNMock.run(projectDir);
 
-const getFileFromFileSystem = fileName => {
-    return fs.readFileSync(path.resolve(mockDir, mixNMockServiceBasePath, fileName), 'utf-8');
-};
+const getRemoteServerFile = fileName => fs.readFileSync(path.resolve(remoteServerMockDir, mixNMockServiceBasePath, fileName), 'utf-8');
+const getLocalMockFile = (pathName, fileName) => fs.readFileSync(path.resolve(localMockDir, pathName, fileName), 'utf-8');
 
-const getRequestUrl = fileName => {
-    return `http://localhost:${mixNMockPort}${mixNMockRoot}/${mixNMockServiceBasePath}/${fileName}`;
-};
+const getRequestUrl = part => `http://localhost:${mixNMockPort}${mixNMockRoot}/${mixNMockServiceBasePath}/${part}`;
 
 // run tests
 describe('Proxying of remote calls with mix\'n\'mock', function () {
     it('Should fetch the test file from the remote server', function (done) {
-        let expected = getFileFromFileSystem('testfile.txt');
+        let expected = getRemoteServerFile('testfile.txt');
         request(getRequestUrl('testfile.txt'), (error, response, body) => {
             expect(error).toNotExist();
             expect(response.statusCode).toEqual(200);
@@ -66,7 +65,7 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         this.slow(1000);
         this.timeout(1000);
         const startTime = Date.now();
-        let expected = getFileFromFileSystem('delayed.txt');
+        let expected = getRemoteServerFile('delayed.txt');
         request(getRequestUrl('delayed.txt'), (error, response, body) => {
             const endTime = Date.now();
             expect(error).toNotExist();
@@ -77,9 +76,8 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         });
     });
     it('Should fetch the test file (without leading slash) from the remote server and delay the response', function (done) {
-        //TODO: The shouldWorkWithoutSlash.txt is specified inside the delayedServices without a leading slash and thus does not work (but it should!)
         const startTime = Date.now();
-        let expected = getFileFromFileSystem('shouldWorkWithoutSlash.txt');
+        let expected = getRemoteServerFile('shouldWorkWithoutSlash.txt');
         request(getRequestUrl('shouldWorkWithoutSlash.txt'), function (error, response, body) {
             const endTime = Date.now();
             expect(error).toNotExist();
@@ -91,10 +89,10 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         done();
     });
 });
-describe('Mocking GET request', function () {
+describe('Mocking GET responses', function () {
     it('should return a JSON response when sending a GET request', function (done) {
-        let expected = JSON.parse(getFileFromFileSystem('get.data.json'));
-        request(getRequestUrl('get.data.json'), function (error, response, body) {
+        let expected = JSON.parse(getLocalMockFile('GET', 'get-result.example.json'));
+        request(getRequestUrl('directdata'), function (error, response, body) {
             expect(error).toNotExist();
             expect(response.statusCode).toEqual(200);
             expect(JSON.parse(body)).toEqual(expected);

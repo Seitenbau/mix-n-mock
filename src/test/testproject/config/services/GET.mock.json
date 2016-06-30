@@ -3,7 +3,7 @@
     "services": [
         {
             "active": true,
-            "path": "exampleEndpoint",
+            "path": "directdata",
             "file": "get-result.example.json"
         }
     ]
