@@ -5,6 +5,12 @@
             "active": true,
             "path": "directdata",
             "file": "post-result.example.json"
+        },
+        {
+            "active": true,
+            "path": "delayeddata",
+            "file": "post-result.example.json",
+            "delayBy": 750
         }
     ]
 }

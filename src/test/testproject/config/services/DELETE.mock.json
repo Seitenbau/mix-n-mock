@@ -5,6 +5,12 @@
             "active": true,
             "path": "directdata",
             "file": "delete-result.example.json"
+        },
+        {
+            "active": true,
+            "path": "delayeddata",
+            "file": "delete-result.example.json",
+            "delayBy": 750
         }
     ]
 }

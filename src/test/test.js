@@ -52,6 +52,7 @@ const getRequestUrl = part => `http://localhost:${mixNMockPort}${mixNMockRoot}/$
 
 // run tests
 describe('Proxying of remote calls with mix\'n\'mock', function () {
+    this.slow(1000);
     it('Should fetch the test file from the remote server', function (done) {
         let expected = getRemoteServerFile('testfile.txt');
         request(getRequestUrl('testfile.txt'), (error, response, body) => {
@@ -62,7 +63,6 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         });
     });
     it('Should fetch the test file from the remote server and delay the response', function (done) {
-        this.slow(1000);
         this.timeout(1000);
         const startTime = Date.now();
         let expected = getRemoteServerFile('delayed.txt');
@@ -86,11 +86,12 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
             expect(endTime - startTime).toBeGreaterThan(300);
             done();
         });
-        done();
     });
 });
-['GET', 'PUT', 'POST', 'DELETE'].forEach(method => {
+const methods = ['GET', 'PUT', 'POST', 'DELETE'];
+methods.forEach(method => {
     describe(`Mocking ${method} responses`, function () {
+        this.slow(800);
         it(`should return a JSON response when sending a ${method} request`, function (done) {
             let expected = JSON.parse(getLocalMockFile(method, `${method.toLowerCase()}-result.example.json`));
             request({uri: getRequestUrl('directdata'), method: method}, function (error, response, body) {
@@ -104,6 +105,19 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
             request({method: method, uri: getRequestUrl('does.not.exist.json')}, function (error, response, body) {
                 expect(error).toNotExist();
                 expect(response.statusCode).toEqual(404);
+                done();
+            });
+        });
+        it(`should return a delayed JSON response when sending a ${method} request`, done => {
+            this.timeout(800);
+            const startTime = Date.now();
+            let expected = JSON.parse(getLocalMockFile(method, `${method.toLowerCase()}-result.example.json`));
+            request({uri: getRequestUrl('delayeddata'), method: method}, function (error, response, body) {
+                const endTime = Date.now();
+                expect(error).toNotExist();
+                expect(response.statusCode).toEqual(200);
+                expect(JSON.parse(body)).toEqual(expected);
+                expect(endTime - startTime).toBeGreaterThan(750);
                 done();
             });
         });
