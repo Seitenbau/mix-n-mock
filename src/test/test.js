@@ -75,10 +75,10 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
             done();
         });
     });
-    it('Should fetch the test file (without leading slash) from the remote server and delay the response', function (done) {
+    it('Should fetch the test file (without leading slash) from the remote server and delay the response', done => {
         const startTime = Date.now();
         let expected = getRemoteServerFile('shouldWorkWithoutSlash.txt');
-        request(getRequestUrl('shouldWorkWithoutSlash.txt'), function (error, response, body) {
+        request(getRequestUrl('shouldWorkWithoutSlash.txt'), (error, response, body) => {
             const endTime = Date.now();
             expect(error).toNotExist();
             expect(response.statusCode).toEqual(200);
@@ -89,22 +89,25 @@ describe('Proxying of remote calls with mix\'n\'mock', function () {
         done();
     });
 });
-describe('Mocking GET responses', function () {
-    it('should return a JSON response when sending a GET request', function (done) {
-        let expected = JSON.parse(getLocalMockFile('GET', 'get-result.example.json'));
-        request(getRequestUrl('directdata'), function (error, response, body) {
-            expect(error).toNotExist();
-            expect(response.statusCode).toEqual(200);
-            expect(JSON.parse(body)).toEqual(expected);
-            done();
+['GET', 'PUT', 'POST', 'DELETE'].forEach(method => {
+    describe(`Mocking ${method} responses`, function () {
+        it(`should return a JSON response when sending a ${method} request`, function (done) {
+            let expected = JSON.parse(getLocalMockFile(method, `${method.toLowerCase()}-result.example.json`));
+            request({uri: getRequestUrl('directdata'), method: method}, function (error, response, body) {
+                expect(error).toNotExist();
+                expect(response.statusCode).toEqual(200);
+                expect(JSON.parse(body)).toEqual(expected);
+                done();
+            });
         });
-    });
-    it('should return 404 when requesting a non-existing file', function (done) {
-        request(getRequestUrl('does.not.exist.json'), function (error, response, body) {
-            expect(error).toNotExist();
-            expect(response.statusCode).toEqual(404);
-            done();
+        it('should return 404 when requesting a non-existing file', function (done) {
+            request({method: method, uri: getRequestUrl('does.not.exist.json')}, function (error, response, body) {
+                expect(error).toNotExist();
+                expect(response.statusCode).toEqual(404);
+                done();
+            });
         });
     });
 });
+
 

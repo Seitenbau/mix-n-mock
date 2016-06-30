@@ -3,9 +3,8 @@
     "services": [
         {
             "active": true,
-            "path": "exampleEndpoint",
-            "file": "put-result.example.json",
-            "delayBy": 1000
+            "path": "directdata",
+            "file": "put-result.example.json"
         }
     ]
 }
