@@ -11,6 +11,12 @@
             "path": "delayeddata",
             "file": "get-result.example.json",
             "delayBy": 750
+        },
+        {
+            "active": true,
+            "path": "httpstatuscode",
+            "file": "get-result.example.json",
+            "status": 402
         }
     ]
 }

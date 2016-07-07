@@ -101,7 +101,7 @@ describe(`Fetching local static files with mix'n'mock`, function () {
             expect(response.statusCode).toEqual(200);
             expect(body).toEqual(indexHtml);
             done();
-        })
+        });
     });
 });
 
@@ -138,6 +138,15 @@ methods.forEach(method => {
                 expect(response.statusCode).toEqual(200);
                 expect(JSON.parse(body)).toEqual(expected);
                 expect(endTime - startTime).toBeGreaterThan(750);
+                done();
+            });
+        });
+        it('should return the configured HTTP status code', function (done) {
+            let expected = JSON.parse(getLocalMockFile(method, `${method.toLowerCase()}-result.example.json`));
+            request({uri: getServiceRequestUrl('httpstatuscode'), method: method}, function (error, response, body) {
+                expect(error).toNotExist();
+                expect(response.statusCode).toEqual(402);
+                expect(JSON.parse(body)).toEqual(expected);
                 done();
             });
         });
