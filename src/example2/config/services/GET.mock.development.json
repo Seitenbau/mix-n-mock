@@ -6,9 +6,7 @@
             "file": "get-result.example.json"
         }, {
             "path": "mix-n-mock",
-            "error": {
-                "status": 500
-            }
+            "status": 500
         }
     ]
 }

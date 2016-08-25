@@ -35,15 +35,16 @@ The path stores the route which should be mocked. It is a path relative to the `
 
 #### file (optional)
 
-The JSON file which has to be returned if the route is called. The file name will be resolved relative to `mock` path specified in the `filesystem.path.json` followed by the HTTP method name. E.g. `file` is set to "delete-result.example.json",  `mock` is set to "example-mocks" and the configuration file is `DELETE.mock.json` then the application will return `example-mocks/DELETE/delete-result.example.json`.
-The file property can be skipped if the route should only return an error.
+The JSON file which has to be returned if the route is called. The file name will be resolved relative to `mock` path specified in the `filesystem.path.json` followed by the HTTP method name. E.g. `file` is set to `"delete-result.example.json"`,  `mock` is set to `"example-mocks"` and the configuration file is `DELETE.mock.json` then the application will return `example-mocks/DELETE/delete-result.example.json`.
+The `file` property can be left out if the HTTP response should contain no body.
+
 #### delayBy (optional)
 
 The amount time (in milliseconds) which passes before the file is returned.
 
-#### error (optional)
+#### status (optional)
 
-A route can not only return a static mock file but is also able to return any HTTP error code. This is configured by adding the optional error property in which the HTTP code can be specified:
+A route can not only return a static mock file but is also able to return any HTTP code. This is configured by adding the optional `status` property in which the HTTP code can be specified:
 
 ```javascript
 {
@@ -54,12 +55,8 @@ A route can not only return a static mock file but is also able to return any HT
             "path": "exampleEndpoint",
             "file": "delete-result.error.json",
             "delayBy": 5000,
-            "error": {
-                "status": 500
-            }
+            "status": 500
         }
     ]
 }
 ```
-
-If the error property is present, the file property can be left out if the HTTP response should contain no body.

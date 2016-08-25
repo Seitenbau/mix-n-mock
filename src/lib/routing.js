@@ -27,68 +27,34 @@ const getFilePath = require('./helpers/getFilePath');
 
 let setup = (expressWare, roots, paths, localProxyConfig, serverProxyConfig, projectConfig) => {
     let setupMocks = (mockFilesDirAbs, projectConfig) => {
-        /**
-         * Sends back the given error and delays the response
-         * @param {{error: string, status: number}} errorConfig The error configuration object
-         * @param {number} delayBy The number of milliseconds by which the response is delayed
-         * @param {string=} filePath
-         * @param {{}} request The request object
-         * @param {{}} response The response object
-         */
-        let sendDelayedError = (errorConfig, delayBy, filePath, request, response) => {
-            let responseFunc;
-            if (errorConfig.error) {
-                responseFunc = response.send.bind(response, errorConfig.status, {faultCode: errorConfig.error});
-            } else if (filePath) {
-                responseFunc = () => response.status(errorConfig.status).sendfile(filePath);
-            }
-            setTimeout(responseFunc, delayBy);
-        };
-
-        /**
-         * Sends back the specified error
-         * @param {{status: string, error: string=}} errorConfig The error config holding the HTTP status and the
-         * error id or the error response object
-         * @param {string=} filePath
-         * @param {{}} request The request object
-         * @param {{}} response The response object
-         */
-        let sendError = (errorConfig, filePath, request, response) => {
-            if (errorConfig.error) {
-                response.send(errorConfig.status, {faultCode: errorConfig.error});
-            } else if (filePath) {
-                response.status(errorConfig.status).sendfile(filePath);
-            }
-        };
 
         /**
          * Returns a function for mocking the request based on the given mock configuration
          * @param {{
-         *     file: string,
+         *     file: string=,
          *     delayBy: number,
-         *     error: {
-         *         status: number,
-         *         error: string
-         *     },
+         *     status: number=,
          *     path: string,
          *     active: boolean
-         * }} mock The configuration object
+         * }} mock The configuration object.
+         * If `file` is missing, an empty response body is used. `status` defaults to 200
          * @param {string} filePath The full path to the file which is send as a response
          * @return {Function|undefined}
          */
         let getMockingFunction = (mock, filePath) => {
+            let status = mock.status || 200;
             let mockFunc;
-            if (mock.file && !mock.error) {
+            if (mock.file) {
                 if (mock.delayBy) {
-                    mockFunc = (request, response) => setTimeout(() => response.sendfile(filePath), mock.delayBy);
+                    mockFunc = (request, response) => setTimeout(() => response.status(status).sendfile(filePath), mock.delayBy);
                 } else {
-                    mockFunc = (request, response) => response.sendfile(filePath);
+                    mockFunc = (request, response) => response.status(status).sendfile(filePath);
                 }
-            } else if (mock.error) {
+            } else {
                 if (mock.delayBy) {
-                    mockFunc = sendDelayedError.bind(this, mock.error, mock.delayBy, filePath);
+                    mockFunc = (request, response) => setTimeout(() => response.send(status), mock.delayBy);
                 } else {
-                    mockFunc = sendError.bind(this, mock.error, filePath);
+                    mockFunc = (request, response) => response.send(status);
                 }
             }
             return mockFunc;
