@@ -39,20 +39,25 @@ let remoteServerMockDir = path.resolve(__dirname, 'remote-server-mock');
 let localMockDir = path.resolve(projectDir, localMockBasePath);
 let localStaticDir = path.resolve(projectDir, localStaticBasePath);
 
-// start remote mock and mix-n-mock instance
-let expressWare = express();
-expressWare.use('/', express.static(remoteServerMockDir, {redirect: false}));
-let remoteMock = http.createServer(expressWare);
-console.info(`Launching static mock server on port ${remoteMockPort}`);
-remoteMock.listen(remoteMockPort);
-mixNMock.run(projectDir);
-
 const getRemoteServerFile = fileName => fs.readFileSync(path.resolve(remoteServerMockDir, mixNMockServiceBasePath, fileName), 'utf-8');
 const getLocalMockFile = (pathName, fileName) => fs.readFileSync(path.resolve(localMockDir, pathName, fileName), 'utf-8');
 const getLocalStaticFile = fileName => fs.readFileSync(path.resolve(localStaticDir, fileName), 'utf-8');
 
 const getUrl = part => `http://localhost:${mixNMockPort}${mixNMockRoot}/${part}`;
 const getServiceRequestUrl = part => getUrl(`${mixNMockServiceBasePath}/${part}`);
+
+before(`Setting up static asset server`, function () {
+    // start remote mock and mix-n-mock instance
+    let expressWare = express();
+    expressWare.use('/', express.static(remoteServerMockDir, {redirect: false}));
+    let remoteMock = http.createServer(expressWare);
+    console.info(`Launching static mock server on port ${remoteMockPort}`);
+    remoteMock.listen(remoteMockPort);
+});
+
+before(`Setting up mix-n-mock server`, function () {
+    mixNMock.run(projectDir);
+});
 
 // run tests
 describe(`Proxying of remote calls with mix'n'mock`, function () {
